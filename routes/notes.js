@@ -2,7 +2,7 @@ const express = require('express');
 const router = require('express').Router();
 const { readAndAppend, writeToFile, readFromFile } = require('../helpers/fsUtils');
 const uuid = require('../helpers/uuid');
-
+const fs = require("fs");
 
 router.get('/', (req, res) => {
     readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)))
@@ -31,12 +31,15 @@ router.post('/', (req, res) => {
     }
 });
 
-// router.delete('/:id', (req, res) => {
-//     const { id } = req.params
-//     const notes = JSON.parse()
+router.delete('/:id', (req, res) => {
+    const {id} = req.params
+    const notes = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
 
-// })
-
-// readAndAppend(newNote, './db/db.json')
+    const noteIndex = notes.findIndex((note) => note.note_id === id);
+    notes.splice(noteIndex, 1);
+    writeToFile("./db/db.json", notes);
+  
+    return res.send();
+  });
 
 module.exports = router;
